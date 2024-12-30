@@ -3,38 +3,54 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
 
-// Configurações básicas
+
 app.use(express.json());
 app.use(cors());
 
-// Configuração do Nodemailer
+
 const transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: '587',
+    port: 587,
     secure: false,
     auth: {
-        user: 'pedrohenriqueherculanodias@gmail.com', // Substitua pelo seu email
-        pass: 'rttt hfov lljg mqvb',  // Substitua pela senha de app do Gmail
+        user: 'pedrohenriqueherculanodias@gmail.com', 
+        pass: 'rttt hfov lljg mqvb', 
     },
 });
 
-// Rota para envio de e-mails
+
 app.post('/send-email', (req, res) => {
-    const { to, subject, html, text } = req.body;
+    const { nome, email, celular, mensagem } = req.body;
+
+    const subject = `Nova mensagem de contato de ${nome}`;
+    const text = `
+        Nome: ${nome}
+        Email para resposta: ${email}
+        Celular: ${celular}
+        Mensagem: ${mensagem}
+    `;
+    const html = `
+        <h3>Nova mensagem de contato</h3>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>Email para resposta:</strong> ${email}</p>
+        <p><strong>Celular:</strong> ${celular}</p>
+        <p><strong>Mensagem:</strong><br>${mensagem}</p>
+    `;
 
     transport.sendMail({
-        from: 'pedrohenriqueherculanodias@gmail.com', // Substitua pelo seu email
-        to,
+        from: 'Contato Anônimo <suaConta@gmail.com>',
+        to: 'pedrohenriqueherculanodias@gmail.com',
         subject,
-        html,
         text,
+        html,
     })
     .then(() => res.status(200).send('Email enviado com sucesso!'))
     .catch(err => res.status(500).send('Erro ao enviar o email: ' + err.message));
 });
 
-// Inicialização do servidor
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
+
+
